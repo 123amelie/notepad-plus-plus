@@ -1,0 +1,42 @@
+document.querySelectorAll("input[type=range]").forEach(input => {
+    input.addEventListener("input", () => {
+        document.getElementById("val_" + input.id).innerText = input.value;
+        updateCharts();
+    });
+});
+
+function updateCharts() {
+    const aliment = parseFloat(document.getElementById("aliment").value);
+    const poidsInitial = parseFloat(document.getElementById("poids").value);
+    const nombre = parseInt(document.getElementById("nombre").value);
+    const duree = parseInt(document.getElementById("duree").value);
+    const temp = parseFloat(document.getElementById("temp").value);
+    const qualite = parseInt(document.getElementById("qualite").value);
+
+    let poids = [];
+    let jours = [];
+    let couts = [];
+    let dailyGain = aliment * (0.1 + 0.02 * qualite) * (1 - Math.abs(22 - temp) / 20);
+
+    for (let i = 0; i < duree; i++) {
+        jours.push(i);
+        poids.push(poidsInitial + dailyGain * i);
+        couts.push(aliment * nombre * i * 0.5); // 0.5€/kg
+    }
+
+    Plotly.newPlot("growthChart", [{
+        x: jours,
+        y: poids,
+        type: "scatter",
+        name: "Poids des porcs"
+    }], { title: "Croissance des porcs (kg)" });
+
+    Plotly.newPlot("costChart", [{
+        x: jours,
+        y: couts,
+        type: "scatter",
+        name: "Coût cumulé (€)"
+    }], { title: "Coût alimentaire cumulé (€)" });
+}
+
+updateCharts();
